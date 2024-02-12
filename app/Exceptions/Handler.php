@@ -3,6 +3,9 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -23,8 +26,32 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->reportable(function (ValidationException $exception, $request) {
+            $errors = [];
+            foreach ($exception->errors() as $field => $error) {
+                $field = preg_replace('/\.\d+$/', '', $field); // 配列の場合ひとまとめにする
+                $errors[] = [
+                    'field' => $field,
+                    'detail' => $error[0],
+                ];
+            }
+
+            return response()->json([
+                'message' => '入力項目に誤りがあります。',
+                'errors' => $errors,
+            ], $exception->status);
+        });
+
+        $this->renderable(function (HttpException $exception, $request) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], $exception->getStatusCode());
+        });
+
+        $this->renderable(function (APIBusinessLogicException $exception, $request) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], $exception->getCode());
         });
     }
 }

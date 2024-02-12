@@ -56,4 +56,46 @@ class SignupTest extends TestCase
         ]);
     }
 
+     /*
+     * メールアドレス重複のケース
+     */
+    public function test_signup_duplicated_email()
+    {
+        $user = User::factory()->create([
+            'email' => 'test@example.com',
+        ]);
+
+        $response = $this->postJson('/easymarket/api/auth/signup', [
+            'email' => 'test@example.com',
+            'password' => 'test-password',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    /*
+     * バリデーションエラー
+     */
+    public function test_signup_validation_error()
+    {
+        $response = $this->postJson('/easymarket/api/auth/signup', []);
+
+        $response->assertStatus(422)
+        ->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has('message')
+                ->has('errors', 2)
+                ->has(
+                    'errors.0',
+                    fn ($json) => $json->where('field', 'email')
+                        ->has('detail')
+                )
+                ->has(
+                    'errors.1',
+                    fn ($json) => $json->where('field', 'password')
+                        ->has('detail')
+                )
+        );
+    }
+
 }
