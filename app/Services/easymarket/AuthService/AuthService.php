@@ -8,6 +8,11 @@ use App\Services\easymarket\Dtos\OperationResult;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Verified;
+use App\Services\easymarket\AuthService\Exceptions\InvalidSignatureException;
+use App\Services\easymarket\AuthService\Exceptions\UserAlreadyVerifiedException;
+use App\Services\easymarket\AuthService\Exceptions\UserNotFoundException;
+use App\Services\easymarket\AuthService\Dtos\AccessToken;
 
 class AuthService implements AuthServiceInterface
 {
@@ -64,4 +69,58 @@ class AuthService implements AuthServiceInterface
 
         return $frontendAppVerifyPageUrl . '?' . $query;
     }
+
+    /**
+     * 認証情報が正しいか検証する
+     *
+     * @param  int  $id
+     * @param  int  $expires
+     * @param  string  $signature
+     * @return bool
+     */
+    private function verifySignature(int $id, int $expires, string $signature): bool
+    {
+        $calculatedSignature = hash_hmac(
+            'sha256',
+            $id . $expires,
+            config('app.key')
+        );
+
+        return $calculatedSignature === $signature;
+    }
+
+    /**
+     * メール認証をして、認証情報が正しければユーザー本登録する
+     *
+     * @param  int  $id
+     * @param  int  $expires
+     * @param  string  $signature
+     * @exception InvalidSignatureException
+     * @exception UserAlreadyVerifiedException
+     * @exception UserNotFoundException
+     * @return AccessToken
+     */
+    public function signupVerify(int $id, int $expires, string $signature): AccessToken
+    {
+        if (!$this->verifySignature($id, $expires, $signature)) {
+            throw new InvalidSignatureException();
+        }
+
+        $user = User::find($id);
+
+        if (!$user) {
+            throw new UserNotFoundException();
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            throw new UserAlreadyVerifiedException();
+        }
+
+        $user->markEmailAsVerified();
+        event(new Verified($user));
+        $accessToken = $user->createToken(self::API_TOKEN_NAME)->plainTextToken;
+
+        return new AccessToken($accessToken, $user);
+    }
+
 }

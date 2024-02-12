@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers\easymarket\API;
 
+use App\Exceptions\APIBusinessLogicException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\easymarket\API\Auth\SignupRequest;
+use App\Http\Requests\easymarket\API\Auth\SignupVerifyRequest;
+use App\Http\Resources\easymarket\API\AccessTokenResource;
 use App\Http\Resources\easymarket\API\OperationResultResource;
+use App\Services\easymarket\AuthService\Exceptions\InvalidSignatureException;
 use App\Services\easymarket\AuthService\AuthServiceInterface;
+use App\Services\easymarket\AuthService\Exceptions\UserAlreadyVerifiedException;
 
 class AuthController extends Controller
 {
@@ -30,7 +35,6 @@ class AuthController extends Controller
      * @param  SignupRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-
     public function signup(SignupRequest $request)
     {
         $params = $request->safe()->toArray();
@@ -39,6 +43,30 @@ class AuthController extends Controller
         $operationResult = $this->authService->signup($email, $password);
 
         return (new OperationResultResource($operationResult))->response()->setStatusCode(201);
+    }
+
+    /**
+     * 会員本登録API
+     *
+     * @param  SignupVerifyRequest $request
+     * @return AccessTokenResource
+     */
+    public function signupVerify(SignupVerifyRequest $request)
+    {
+        $params = $request->safe()->toArray();
+        $userId = $params['id'];
+        $expires = $params['expires'];
+        $signature = $params['signature'];
+
+        try {
+            $accessToken = $this->authService->signupVerify($userId, $expires, $signature);
+        } catch (InvalidSignatureException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        } catch (UserAlreadyVerifiedException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        }
+
+        return new AccessTokenResource($accessToken);
     }
 
 }

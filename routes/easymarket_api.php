@@ -16,4 +16,5 @@ use App\Http\Controllers\easymarket\API\AuthController;
 |
 */
 Route::post('/auth/signup', [AuthController::class, 'signup']);
+Route::post('/auth/signup/verify', [AuthController::class, 'signupVerify']);
 
