@@ -5,7 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -21,12 +21,20 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
+    /*
+     * APIBusinessLogicExceptionはビジネスロジック中でのエラーなので、
+     * Exceptionのログが出力されないようにする
+     */
+    protected $dontReport = [
+        APIBusinessLogicException::class,
+    ];
+
     /**
      * Register the exception handling callbacks for the application.
      */
     public function register(): void
     {
-        $this->reportable(function (ValidationException $exception, $request) {
+        $this->renderable(function (ValidationException $exception, $request) {
             $errors = [];
             foreach ($exception->errors() as $field => $error) {
                 $field = preg_replace('/\.\d+$/', '', $field); // 配列の場合ひとまとめにする
@@ -53,5 +61,6 @@ class Handler extends ExceptionHandler
                 'message' => $exception->getMessage(),
             ], $exception->getCode());
         });
+
     }
 }
