@@ -22,6 +22,8 @@ Route::post('/auth/signup/verify', [AuthController::class, 'signupVerify']);
 Route::post('/auth/signin', [AuthController::class, 'signin']);
 
 Route::middleware(['auth:easymarket_api', 'verified'])->group(function () {
+    Route::post('/auth/signout', [AuthController::class, 'signout']);
+
     Route::get('/me', [MeController::class, 'show']);
 });
 

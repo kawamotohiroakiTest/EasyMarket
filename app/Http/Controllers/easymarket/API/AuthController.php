@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\easymarket\API\Auth\SignupRequest;
 use App\Http\Requests\easymarket\API\Auth\SignupVerifyRequest;
 use App\Http\Requests\easymarket\API\Auth\SigninRequest;
+use App\Http\Requests\easymarket\API\Auth\SignoutRequest;
 use App\Http\Resources\easymarket\API\AccessTokenResource;
 use App\Http\Resources\easymarket\API\OperationResultResource;
 use App\Services\easymarket\AuthService\Exceptions\InvalidSignatureException;
@@ -92,5 +93,18 @@ class AuthController extends Controller
         return new AccessTokenResource($accessToken);
     }
 
+    /**
+     * ログアウトAPI
+     * 
+     * @param  SignoutRequest $request
+     * @return OperationResultResource
+     */
+    public function signout(SignoutRequest $request)
+    {
+        $operationResult = $this->authService->signout();
 
+        return new OperationResultResource($operationResult);
+    }
 }
+
+

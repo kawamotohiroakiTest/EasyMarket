@@ -172,5 +172,4 @@ class AuthService implements AuthServiceInterface
         return new OperationResult(true);
     }
 
-
 }
