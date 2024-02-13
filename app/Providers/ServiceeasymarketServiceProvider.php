@@ -25,6 +25,10 @@ class ServiceeasymarketServiceProvider extends ServiceProvider
             \App\Services\easymarket\UserService\UserServiceInterface::class,
             \App\Services\easymarket\UserService\UserService::class
         );
+        $this->app->bind(
+            \App\Services\easymarket\ProductService\ProductServiceInterface::class,
+            \App\Services\easymarket\ProductService\ProductService::class
+        );
     }
 
     /**
