@@ -5,11 +5,13 @@ namespace App\Http\Controllers\easymarket\API;
 use Illuminate\Support\Facades\Auth;
 use App\Exceptions\APIBusinessLogicException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\easymarket\API\Product\IndexRequest;
 use App\Http\Requests\easymarket\API\Product\StoreRequest;
 use App\Http\Resources\easymarket\API\ProductResource;
 use App\Services\easymarket\ProductService\Dtos\StoreCommand;
 use App\Services\easymarket\ProductService\ProductServiceInterface;
 use App\Services\easymarket\ProductService\Exceptions\IncompleteSellerInfoException;
+use App\Http\Resources\easymarket\API\ProductCollection;
 
 class ProductController extends Controller
 {
@@ -29,6 +31,25 @@ class ProductController extends Controller
         $this->productService = $productService;
     }
 
+    /**
+     * 商品一覧取得API
+     * 
+     * @param  IndexRequest  $request
+     * @return ProductCollection
+     */
+    public function index(IndexRequest $request)
+    {
+        $products = $this->productService->get();
+
+        return new ProductCollection($products);
+    }
+
+    /**
+     * 出品API
+     * 
+     * @param  StoreRequest  $request
+     * @return ProductResource
+     */
     public function store(StoreRequest $request)
     {
         $params = $request->safe();

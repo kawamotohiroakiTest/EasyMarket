@@ -8,6 +8,8 @@ use App\Services\easymarket\ProductService\Dtos\StoreCommand;
 use App\Services\easymarket\ProductService\Exceptions\IncompleteSellerInfoException;
 use App\Services\easymarket\ImageService\ImageServiceInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+
 
 class ProductService implements ProductServiceInterface
 {
@@ -26,6 +28,16 @@ class ProductService implements ProductServiceInterface
     )
     {
         $this->imageService = $imageService;
+    }
+
+    /*
+     * 商品取得
+     * 
+     * @return Collection<Product>
+     */
+    public function get(): Collection
+    {
+        return Product::orderBy('id', 'desc')->get();
     }
 
     /*
