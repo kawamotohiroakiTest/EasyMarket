@@ -6,11 +6,13 @@ use App\Exceptions\APIBusinessLogicException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\easymarket\API\Auth\SignupRequest;
 use App\Http\Requests\easymarket\API\Auth\SignupVerifyRequest;
+use App\Http\Requests\easymarket\API\Auth\SigninRequest;
 use App\Http\Resources\easymarket\API\AccessTokenResource;
 use App\Http\Resources\easymarket\API\OperationResultResource;
 use App\Services\easymarket\AuthService\Exceptions\InvalidSignatureException;
 use App\Services\easymarket\AuthService\AuthServiceInterface;
 use App\Services\easymarket\AuthService\Exceptions\UserAlreadyVerifiedException;
+use App\Services\easymarket\AuthService\Exceptions\InvalidCredentialsException;
 
 class AuthController extends Controller
 {
@@ -68,5 +70,27 @@ class AuthController extends Controller
 
         return new AccessTokenResource($accessToken);
     }
+
+    /**
+     * ログインAPI
+     * 
+     * @param  SigninRequest $request
+     * @return AccessTokenResource
+     */
+    public function signin(SigninRequest $request)
+    {
+        $params = $request->safe()->toArray();
+        $email = $params['email'];
+        $password = $params['password'];
+
+        try {
+            $accessToken = $this->authService->signin($email, $password);
+        } catch (InvalidCredentialsException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        }
+
+        return new AccessTokenResource($accessToken);
+    }
+
 
 }

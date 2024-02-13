@@ -13,6 +13,11 @@ use App\Services\easymarket\AuthService\Exceptions\InvalidSignatureException;
 use App\Services\easymarket\AuthService\Exceptions\UserAlreadyVerifiedException;
 use App\Services\easymarket\AuthService\Exceptions\UserNotFoundException;
 use App\Services\easymarket\AuthService\Dtos\AccessToken;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Support\Facades\Auth;
+use App\Services\easymarket\AuthService\Exceptions\InvalidCredentialsException;
+
+
 
 class AuthService implements AuthServiceInterface
 {
@@ -122,5 +127,50 @@ class AuthService implements AuthServiceInterface
 
         return new AccessToken($accessToken, $user);
     }
+
+    /**
+     * ログインする＝ログイン情報が正しければアクセストークンを返す
+     *
+     * @param  string  $email
+     * @param  string  $password
+     * @exception AuthenticationException
+     * @exception InvalidCredentialsException
+     * @return AccessToken
+     */
+    public function signin(string $email, string $password): AccessToken
+    {
+        $user = User::where('email', $email)->first();
+
+        if ($user && !$user->hasVerifiedEmail()) {
+            throw new AuthenticationException('メールアドレス認証が完了していません。');
+        }
+
+        if (!$user || !Hash::check($password, $user->password)) {
+            throw new InvalidCredentialsException();
+        }
+    
+        $plainTextToken = $user->createToken(self::API_TOKEN_NAME)->plainTextToken;
+    
+        return new AccessToken($plainTextToken, $user);
+    }
+
+    /**
+     * ログアウトする＝ユーザーの発行済みアクセストークンを削除する
+     * 
+     * @return OperationResult
+     */
+    public function signout(): OperationResult
+    {
+        if (!Auth::check()) {
+            return new OperationResult(false);
+        }
+
+        /** @var User $user **/
+        $user = Auth::user();
+
+        $user->tokens()->delete();
+        return new OperationResult(true);
+    }
+
 
 }
