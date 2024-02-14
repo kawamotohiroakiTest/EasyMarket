@@ -5,8 +5,10 @@ namespace App\Http\Controllers\easymarket\API;
 use Illuminate\Support\Facades\Auth;
 use App\Exceptions\APIBusinessLogicException;
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Http\Requests\easymarket\API\Product\IndexRequest;
 use App\Http\Requests\easymarket\API\Product\StoreRequest;
+use App\Http\Requests\easymarket\API\Product\ShowRequest;
 use App\Http\Resources\easymarket\API\ProductResource;
 use App\Services\easymarket\ProductService\Dtos\StoreCommand;
 use App\Services\easymarket\ProductService\ProductServiceInterface;
@@ -68,6 +70,17 @@ class ProductController extends Controller
             throw new APIBusinessLogicException($e->getMessage(), 400);
         }
 
+        return new ProductResource($product);
+    }
+
+    /**
+     * 商品一覧取得API
+     * 
+     * @param  ShowRequest  $request
+     * @return ProductResource
+     */
+    public function show(ShowRequest $request, Product $product)
+    {
         return new ProductResource($product);
     }
 
