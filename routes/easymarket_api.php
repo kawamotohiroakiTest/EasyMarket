@@ -42,6 +42,7 @@ Route::middleware(['auth:easymarket_api', 'verified'])->group(function () {
 
     Route::post('/products', [ProductController::class, 'store']);
     Route::post('/products/{product}/deal/payment_intent', [ProductDealController::class, 'createPaymentIntent']);
+    Route::post('/products/{product}/deal/payment_intent/verify', [ProductDealController::class, 'verifyPaymentIntent']);
 
 
 });

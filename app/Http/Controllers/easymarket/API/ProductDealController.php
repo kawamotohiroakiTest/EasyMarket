@@ -6,7 +6,9 @@ use App\Exceptions\APIBusinessLogicException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\easymarket\API\ProductDeal\CancelRequest;
 use App\Http\Requests\easymarket\API\ProductDeal\CreatePaymentIntentRequest;
+use App\Http\Requests\easymarket\API\ProductDeal\VerifyPaymentIntentRequest;
 use App\Http\Resources\easymarket\API\PaymentIntentResource;
+use App\Http\Resources\easymarket\API\DealForMyPageResource;
 use App\Models\Product;
 
 use App\Services\easymarket\DealService\DealServiceInterface;
@@ -59,6 +61,35 @@ class ProductDealController extends Controller
 
         return new PaymentIntentResource($paymentIntent);
     }
+
+    /**
+     * 商品支払いインテント確認API
+     * 
+     * @param  VerifyPaymentIntentRequest  $request
+     * @param  Product  $product
+     * @return DealForMypageResource
+     */
+    public function verifyPaymentIntent(VerifyPaymentIntentRequest $request, Product $product)
+    {
+        $params = $request->safe();
+        /** @var \App\Models\User $buyer */
+        $buyer = Auth::user();
+
+        try {
+            $deal = $this->dealService->verifyPaymentIntent($product->deal, $buyer, $params['payment_intent_id']);
+        } catch (InvalidStatusTransitionException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        } catch (IncompleteBuyerShippingInfoException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        } catch (PaymentIntentIsNotSucceededException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        }
+        $deal->load('dealEvents');
+
+        return new DealForMyPageResource($deal);
+    }
+
+    
 
 
 }
