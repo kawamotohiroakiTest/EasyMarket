@@ -16,6 +16,7 @@ use App\Services\easymarket\UserService\UserServiceInterface;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\easymarket\API\DealForMyPageResource;
 use App\Http\Resources\easymarket\API\ProductForMyPageCollection;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class MeController extends Controller
 {
@@ -112,8 +113,10 @@ class MeController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $products = $this->productService->getListedProductsByUser($user);
+
         return new ProductForMyPageCollection($products);
     }
+    
 
     /**
      * 出品商品の取引詳細情報取得API

@@ -3,7 +3,7 @@
 namespace App\Http\Requests\easymarket\API\Me;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+use Illuminate\Support\Facades\Log;
 class GetListedProductsRequest extends FormRequest
 {
     /**
@@ -11,6 +11,7 @@ class GetListedProductsRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        
         return true;
     }
 

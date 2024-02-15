@@ -5,7 +5,6 @@ use App\Http\Controllers\easymarket\API\AuthController;
 use App\Http\Controllers\easymarket\API\MeController;
 use App\Http\Controllers\easymarket\API\ProductController;
 use App\Http\Controllers\easymarket\API\ProductDealController;
-use Illuminate\Support\Facades\Log;
 
 
 
@@ -38,6 +37,7 @@ Route::middleware(['auth:easymarket_api', 'verified'])->group(function () {
     Route::get('/me/purchased_products', [MeController::class, 'getPurchasedProducts']);
     Route::get('/me/purchased_products/{product}/deal', [MeController::class, 'getPurchasedProductDeal']);
     Route::get('/me/listed_products', [MeController::class, 'getListedProducts']);
+    Route::get('/me/listed_products/{id}', [MeController::class, 'getListedProductDetail']);
     Route::get('/me/listed_products/{product}/deal', [MeController::class, 'getListedProductDeal']);
 
     Route::post('/products', [ProductController::class, 'store']);
