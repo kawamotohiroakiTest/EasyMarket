@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\easymarket\API\ProductDeal\CancelRequest;
 use App\Http\Requests\easymarket\API\ProductDeal\CreatePaymentIntentRequest;
 use App\Http\Requests\easymarket\API\ProductDeal\VerifyPaymentIntentRequest;
+//
 use App\Http\Resources\easymarket\API\PaymentIntentResource;
 use App\Http\Resources\easymarket\API\DealForMyPageResource;
 use App\Models\Product;
@@ -15,6 +16,7 @@ use App\Services\easymarket\DealService\DealServiceInterface;
 use App\Services\easymarket\DealService\Exceptions\InvalidStatusTransitionException;
 use App\Services\easymarket\DealService\Exceptions\IncompleteBuyerShippingInfoException;
 use App\Services\easymarket\DealService\Exceptions\PaymentIntentIsNotSucceededException;
+
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -88,6 +90,29 @@ class ProductDealController extends Controller
 
         return new DealForMyPageResource($deal);
     }
+
+    /**
+     * 商品出品キャンセルAPI
+     * 
+     * @param  CancelRequest  $request
+     * @param  Product  $product
+     * @return DealForMyPageResource
+     */
+    public function cancel(CancelRequest $request, Product $product)
+    {
+        /** @var \App\Models\User $seller */
+        $seller = Auth::user();
+
+        try {
+            $deal = $this->dealService->cancel($product->deal, $seller);
+        } catch (InvalidStatusTransitionException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        }
+        $deal->load('dealEvents');
+
+        return new DealForMyPageResource($deal);
+    }
+
 
     
 

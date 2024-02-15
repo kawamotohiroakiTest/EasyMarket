@@ -10,4 +10,5 @@ interface DealServiceInterface
 {
     public function createPaymentIntent(Deal $deal, User $buyer): PaymentIntent;
     public function verifyPaymentIntent(Deal $deal, User $buyer, string $paymentIntentId): Deal;
+    public function cancel(Deal $deal, User $seller): Deal;
 }
