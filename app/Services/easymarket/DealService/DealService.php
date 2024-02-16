@@ -141,4 +141,64 @@ class DealService implements DealServiceInterface
 
         return $deal;
     }
+
+    /*
+     * 配送報告
+     * 
+     * @param Deal $deal
+     * @param User $seller
+     * @exception InvalidStatusTransitionException
+     * @return Deal
+     */
+    public function reportDelivery(Deal $deal, User $seller): Deal
+    {
+        if (!in_array($deal->status, [DealStatus::Purchased])) {
+            throw new InvalidStatusTransitionException();
+        }
+        
+        $deal = DB::transaction(function () use ($deal, $seller) {
+            $deal->update(['status' => DealStatus::Shipping]);
+
+            $dealEvent = new DealEvent([
+                'actor_type' => DealEventActorType::Seller,
+                'event_type' => DealEventEventType::ReportDelivery,
+            ]);
+            $dealEvent->deal_eventable()->associate($seller);
+            $deal->dealEvents()->save($dealEvent);
+
+            return $deal->fresh();
+        });
+
+        return $deal;
+    }
+
+    /*
+     * 受取報告
+     * 
+     * @param Deal $deal
+     * @param User $buyer
+     * @exception InvalidStatusTransitionException
+     * @return Deal
+     */
+    public function reportReceipt(Deal $deal, User $buyer): Deal
+    {
+        if (!in_array($deal->status, [DealStatus::Shipping])) {
+            throw new InvalidStatusTransitionException();
+        }
+        
+        $deal = DB::transaction(function () use ($deal, $buyer) {
+            $deal->update(['status' => DealStatus::Completed]);
+
+            $dealEvent = new DealEvent([
+                'actor_type' => DealEventActorType::Buyer,
+                'event_type' => DealEventEventType::ReportReceipt,
+            ]);
+            $dealEvent->deal_eventable()->associate($buyer);
+            $deal->dealEvents()->save($dealEvent);
+
+            return $deal->fresh();
+        });
+
+        return $deal;
+    }
 }

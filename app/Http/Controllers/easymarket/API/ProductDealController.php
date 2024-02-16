@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\easymarket\API\ProductDeal\CancelRequest;
 use App\Http\Requests\easymarket\API\ProductDeal\CreatePaymentIntentRequest;
 use App\Http\Requests\easymarket\API\ProductDeal\VerifyPaymentIntentRequest;
+use App\Http\Requests\easymarket\API\ProductDeal\ReportDeliveryRequest;
+use App\Http\Requests\easymarket\API\ProductDeal\ReportReceiptRequest;
 //
 use App\Http\Resources\easymarket\API\PaymentIntentResource;
 use App\Http\Resources\easymarket\API\DealForMyPageResource;
@@ -105,6 +107,50 @@ class ProductDealController extends Controller
 
         try {
             $deal = $this->dealService->cancel($product->deal, $seller);
+        } catch (InvalidStatusTransitionException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        }
+        $deal->load('dealEvents');
+
+        return new DealForMyPageResource($deal);
+    }
+
+    /**
+     * 配送報告API
+     * 
+     * @param  ReportDeliveryRequest  $request
+     * @param  Product  $product
+     * @return DealForMyPageResource
+     */
+    public function reportDelivery(ReportDeliveryRequest $request, Product $product)
+    {
+        /** @var \App\Models\User $seller */
+        $seller = Auth::user();
+
+        try {
+            $deal = $this->dealService->reportDelivery($product->deal, $seller);
+        } catch (InvalidStatusTransitionException $e) {
+            throw new APIBusinessLogicException($e->getMessage(), 400);
+        }
+        $deal->load('dealEvents');
+
+        return new DealForMyPageResource($deal);
+    }
+
+    /**
+     * 受取報告API
+     * 
+     * @param  ReportReceiptRequest  $request
+     * @param  Product  $product
+     * @return DealForMyPageResource
+     */
+    public function reportReceipt(ReportReceiptRequest $request, Product $product)
+    {
+        /** @var \App\Models\User $buyer */
+        $buyer = Auth::user();
+
+        try {
+            $deal = $this->dealService->reportReceipt($product->deal, $buyer);
         } catch (InvalidStatusTransitionException $e) {
             throw new APIBusinessLogicException($e->getMessage(), 400);
         }
