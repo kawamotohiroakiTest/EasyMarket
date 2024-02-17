@@ -4,7 +4,19 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - $(aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com)
+      - echo "AWS CLI version:"
+      - aws --version
+      - echo "Checking AWS_DEFAULT_REGION:"
+      - echo ${AWS_DEFAULT_REGION}
+      - echo "Checking AWS_ACCOUNT_ID:"
+      - echo ${AWS_ACCOUNT_ID}
+      - echo "Attempting to login to ECR with debug information..."
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
+      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/easymarket-backend
+      - echo "REPOSITORY_URI is set to ${REPOSITORY_URI}"
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo "IMAGE_TAG is set to ${IMAGE_TAG}"
   build:
     commands:
       - echo "Building the Docker image from custom Dockerfile..."
