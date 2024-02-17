@@ -12,6 +12,6 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: 'us-east-1' # CodeCommitリポジトリのリージョンに合わせてください
+        AWS_REGION: 'ap-northeast-1'
       run: |
         git push --mirror https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/easymarket-backend
