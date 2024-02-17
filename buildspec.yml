@@ -1,4 +1,4 @@
-version: 0.2 
+version: 0.2
 
 phases:
   pre_build:
@@ -19,18 +19,18 @@ phases:
       - echo "IMAGE_TAG is set to ${IMAGE_TAG}"
   build:
     commands:
-      - echo "Build started on $(date)"
-      - echo "Building the Docker image..."
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - echo "Starting Docker Compose build and up..."
+      - docker-compose -f docker-compose.yml up -d --build
   post_build:
     commands:
-      - echo "Build completed on $(date)"
-      - echo "Pushing the Docker images..."
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo "Writing image definitions file..."
-      - printf '[{"name":"container01","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-artifacts:
-    files:
-      - imagedefinitions.json
+      - echo "Build and deployment completed on $(date)"
+      - echo "Pushing Docker images if necessary..."
+      - |
+        if [ "$(docker images -q $REPOSITORY_URI:$IMAGE_TAG 2> /dev/null)" != "" ]; then
+          echo "Pushing the Docker image..."
+          docker push $REPOSITORY_URI:$IMAGE_TAG
+          echo "Writing image definitions file..."
+          printf '[{"name":"container01","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+        else
+          echo "No Docker image to push. Skipping this step."
+        fi
