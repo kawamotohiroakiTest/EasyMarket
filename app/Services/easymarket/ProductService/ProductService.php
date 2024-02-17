@@ -84,5 +84,67 @@ class ProductService implements ProductServiceInterface
         return $product;
     }
 
+    /*
+     * 購入商品一覧取得
+     * 
+     * @param User $user
+     * @return Collection<Product>
+     */
+    public function getPurchasedProductsByUser(User $user): Collection
+    {
+        // $products = $user->dealsAsBuyer()->with('product')->get()->pluck('product');
+        $products = $user->dealsAsBuyer()
+                ->with(['product.images', 'product.deal']) // product.deal を追加してリレーションをロード
+                ->get()
+                ->map(function ($deal) {
+                    $product = $deal->product;
+                    if ($product) {
+                        // Product に対応する最初の画像の URL を取得
+                        $imageUrl = optional($product->images->first())->file_path;
+                        // Deal のステータスを取得
+                        $dealStatus = $deal->status;
+                        // Product に画像 URL と Deal ステータスを追加
+                        $product->image_url = $imageUrl;
+                        $product->deal_status = $dealStatus;
+                        return $product;
+                    }
+                })
+                ->filter()
+                ->values();
+        return $products;
+    }
+
+    /*
+     * 出品商品一覧取得
+     * 
+     * @param User $user
+     * @return Collection<Product>
+     */
+    public function getListedProductsByUser(User $user): Collection
+    {
+        // $products = $user->dealsAsSeller()->with('product')->get()->pluck('product');
+        $products = $user->dealsAsSeller()
+                ->with(['product.images', 'product.deal']) // product.deal を追加してリレーションをロード
+                ->get()
+                ->map(function ($deal) {
+                    $product = $deal->product;
+                    if ($product) {
+                        // Product に対応する最初の画像の URL を取得
+                        $imageUrl = optional($product->images->first())->file_path;
+                        // Deal のステータスを取得
+                        $dealStatus = $deal->status;
+                        // Product に画像 URL と Deal ステータスを追加
+                        $product->image_url = $imageUrl;
+                        $product->deal_status = $dealStatus;
+                        return $product;
+                    }
+                })
+                ->filter()
+                ->values();
+
+        return $products;
+    }
+    
+
 
 }
