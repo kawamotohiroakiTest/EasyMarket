@@ -10,8 +10,9 @@ phases:
       - echo "Starting Docker Compose build and up..."
       - |
         # 環境変数を介してビルドコンテキストのパスを動的に設定
-        export BUILD_CONTEXT_PATH="$(pwd)/vendor/laravel/sail/runtimes/8.2"
-        sed -i "s|context: ./vendor/laravel/sail/runtimes/8.2|context: ${BUILD_CONTEXT_PATH}|g" docker-compose.yml
+        BUILD_CONTEXT_PATH="$(pwd)/vendor/laravel/sail/runtimes/8.2"
+        # docker-compose.yml内のビルドコンテキストパスを動的に更新
+        sed -i.bak "s|context: ./vendor/laravel/sail/runtimes/8.2|context: ${BUILD_CONTEXT_PATH}|g" docker-compose.yml && rm docker-compose.yml.bak
       - docker-compose -f docker-compose.yml up -d --build
   post_build:
     commands:
