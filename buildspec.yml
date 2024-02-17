@@ -1,27 +1,36 @@
-version: 0.2 
+version: 0.2
 
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
+      - echo "Logging in to Amazon ECR..."
+      - echo "AWS CLI version:"
       - aws --version
-      - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.ap-northeast-1.amazonaws.com
-      - REPOSITORY_URI=882981870627.dkr.ecr.ap-northeast-1.amazonaws.com/easymarket-backend
+      - echo "Checking AWS_DEFAULT_REGION:"
+      - echo ${AWS_DEFAULT_REGION}
+      - echo "Checking AWS_ACCOUNT_ID:"
+      - echo ${AWS_ACCOUNT_ID}
+      - echo "Attempting to login to ECR with debug information..."
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} --debug | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com --debug
+      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/easymarket-backend
+      - echo "REPOSITORY_URI is set to ${REPOSITORY_URI}"
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo "IMAGE_TAG is set to ${IMAGE_TAG}"
   build:
     commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...
+      - echo "Build started on $(date)"
+      - echo "Building the Docker image..."
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker images...
+      - echo "Build completed on $(date)"
+      - echo "Pushing the Docker images..."
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file...
+      - echo "Writing image definitions file..."
       - printf '[{"name":"container01","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
-    files: imagedefinitions.json
+    files:
+      - imagedefinitions.json
