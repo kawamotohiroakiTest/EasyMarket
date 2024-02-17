@@ -4,33 +4,15 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - echo "AWS CLI version:"
-      - aws --version
-      - echo "Checking AWS_DEFAULT_REGION:"
-      - echo ${AWS_DEFAULT_REGION}
-      - echo "Checking AWS_ACCOUNT_ID:"
-      - echo ${AWS_ACCOUNT_ID}
-      - echo "Attempting to login to ECR with debug information..."
       - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
-      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/easymarket-backend
-      - echo "REPOSITORY_URI is set to ${REPOSITORY_URI}"
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=${COMMIT_HASH:=latest}
-      - echo "IMAGE_TAG is set to ${IMAGE_TAG}"
   build:
     commands:
       - echo "Starting Docker Compose build and up..."
+      - |
+        # 環境変数を介してビルドコンテキストのパスを動的に設定
+        export BUILD_CONTEXT_PATH="$(pwd)/vendor/laravel/sail/runtimes/8.2"
+        sed -i "s|context: ./vendor/laravel/sail/runtimes/8.2|context: ${BUILD_CONTEXT_PATH}|g" docker-compose.yml
       - docker-compose -f docker-compose.yml up -d --build
   post_build:
     commands:
       - echo "Build and deployment completed on $(date)"
-      - echo "Pushing Docker images if necessary..."
-      - |
-        if [ "$(docker images -q $REPOSITORY_URI:$IMAGE_TAG 2> /dev/null)" != "" ]; then
-          echo "Pushing the Docker image..."
-          docker push $REPOSITORY_URI:$IMAGE_TAG
-          echo "Writing image definitions file..."
-          printf '[{"name":"container01","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-        else
-          echo "No Docker image to push. Skipping this step."
-        fi
