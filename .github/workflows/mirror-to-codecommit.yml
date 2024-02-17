@@ -24,9 +24,11 @@ jobs:
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
       
-          - name: Push to AWS CodeCommit using SSH
-          env:
-            GIT_SSH_COMMAND: ssh -v -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
-          run: |
-            git remote set-url origin ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/easymarket-backend
-            git push --mirror
+      - name: Setup SSH and push
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          git push --mirror ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/easymarket-backend
