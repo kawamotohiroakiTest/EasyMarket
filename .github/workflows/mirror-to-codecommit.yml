@@ -1,17 +1,32 @@
-name: Mirroring
+name: Mirror AWS CodeCommit
 
-on: [ push, delete ]
+on: [push]
 
 jobs:
-  to_codecommit:
-    runs-on: ubuntu-18.04
+  mirror:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: pixta-dev/repository-mirroring-action@v1
+      - name: Checkout GitHub repository
+        uses: actions/checkout@v2
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          target_repo_url:
-            ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/easymarket-backend
-          ssh_private_key:
-            ${{ secrets.SSH_PRIVATE_KEY }}
-          ssh_username:
-            ${{ secrets.SSH_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+      
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+      
+          - name: Push to AWS CodeCommit using SSH
+          env:
+            GIT_SSH_COMMAND: ssh -v -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+          run: |
+            git remote set-url origin ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/easymarket-backend
+            git push --mirror
