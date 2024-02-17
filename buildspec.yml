@@ -11,7 +11,7 @@ phases:
       - echo "Checking AWS_ACCOUNT_ID:"
       - echo ${AWS_ACCOUNT_ID}
       - echo "Attempting to login to ECR with debug information..."
-      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} --debug | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
       - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/easymarket-backend
       - echo "REPOSITORY_URI is set to ${REPOSITORY_URI}"
       - aws ecr get-login-password - | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.ap-northeast-1.amazonaws.com
