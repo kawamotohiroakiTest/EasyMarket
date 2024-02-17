@@ -14,4 +14,4 @@ jobs:
           ssh_private_key:
             ${{ secrets.SSH_PRIVATE_KEY }}
           ssh_username:
-            ${{ secrets.SSH_KNOWN_HOSTS }}
+            ${{ secrets.SSH_KEY_ID }}
