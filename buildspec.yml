@@ -19,10 +19,18 @@ phases:
       - echo "IMAGE_TAG is set to ${IMAGE_TAG}"
   build:
     commands:
+      - echo "Current working directory is $(pwd)"
+      - echo "Listing contents of the current directory for debug purposes..."
+      - ls -lah
       - echo "Building the Docker image from custom Dockerfile..."
-      - cd vendor/laravel/sail/runtimes/8.2
-      - docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/my-custom-laravel-image:latest .
-  post_build:
+      - |
+        DOCKERFILE_PATH="vendor/laravel/sail/runtimes/8.2/Dockerfile"
+        if [ -f "$DOCKERFILE_PATH" ]; then
+          docker build -f $DOCKERFILE_PATH -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/my-custom-laravel-image:latest .
+        else
+          echo "Dockerfile not found at $DOCKERFILE_PATH"
+          exit 1
+        fi  post_build:
     commands:
       - echo "Pushing the Docker image..."
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/my-custom-laravel-image:latest
