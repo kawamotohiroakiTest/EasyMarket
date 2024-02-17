@@ -14,8 +14,6 @@ phases:
       - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
       - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/easymarket-backend
       - echo "REPOSITORY_URI is set to ${REPOSITORY_URI}"
-      - aws ecr get-login-password - | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.ap-northeast-1.amazonaws.com
-      - REPOSITORY_URI=.dkr.ecr.ap-northeast-1.amazonaws.com/easymarket-backend
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
       - echo "IMAGE_TAG is set to ${IMAGE_TAG}"
