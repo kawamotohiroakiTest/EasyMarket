@@ -1,19 +1,19 @@
-name: Mirror to AWS CodeCommit
+# name: Mirror AWS CodeCommit
 
-on: [push]
+# on: [push]
 
-jobs:
-  mirror:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout GitHub repository
-      uses: actions/checkout@v2
-    - name: Push to AWS CodeCommit
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: 'ap-northeast-1'
-      run: |
-        git config --global credential.helper '!aws codecommit credential-helper $@'
-        git config --global credential.UseHttpPath true
-        git push --mirror https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/easymarket-backend
+# jobs:
+#   mirror:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout GitHub repository
+#       uses: actions/checkout@v2
+#     - name: Push to AWS CodeCommit
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         AWS_REGION: 'ap-northeast-1'
+#       run: |
+#         git config --global credential.helper '!aws codecommit credential-helper $@'
+#         git config --global credential.UseHttpPath true
+#         git push --mirror https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/easymarket-backend
