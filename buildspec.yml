@@ -4,16 +4,14 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
+      - $(aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com)
   build:
     commands:
-      - echo "Starting Docker Compose build and up..."
-      - |
-        # 環境変数を介してビルドコンテキストのパスを動的に設定
-        BUILD_CONTEXT_PATH="$(pwd)/vendor/laravel/sail/runtimes/8.2"
-        # docker-compose.yml内のビルドコンテキストパスを動的に更新
-        sed -i.bak "s|context: ./vendor/laravel/sail/runtimes/8.2|context: ${BUILD_CONTEXT_PATH}|g" docker-compose.yml && rm docker-compose.yml.bak
-      - docker-compose -f docker-compose.yml up -d --build
+      - echo "Building the Docker image from custom Dockerfile..."
+      - cd vendor/laravel/sail/runtimes/8.2
+      - docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/my-custom-laravel-image:latest .
   post_build:
     commands:
-      - echo "Build and deployment completed on $(date)"
+      - echo "Pushing the Docker image..."
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/my-custom-laravel-image:latest
+      - echo "Build and push completed on $(date)"
