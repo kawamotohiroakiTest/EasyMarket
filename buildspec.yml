@@ -24,7 +24,15 @@ phases:
     commands:
       - echo "Pushing the Docker image..."
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/easymarket-backend:latest
-      - echo "Build and push completed on $(date)"
+      - echo Writing image definitions file...
+      - |
+        echo '[
+          {
+            "name": "sample-webserver",
+            "imageUri": "'${AWS_ACCOUNT_ID}'.dkr.ecr.'${AWS_DEFAULT_REGION}'.amazonaws.com/easymarket-backend:latest"
+          }
+        ]' > imagedefinitions.json
+        - echo "Build and push completed on $(date)"
 
 artifacts:
   files:
