@@ -1,4 +1,4 @@
-version: 0.2
+version: 0.2 
 
 phases:
   pre_build:
@@ -25,3 +25,10 @@ phases:
       - echo "Pushing the Docker image..."
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/easymarket-backend:latest
       - echo "Build and push completed on $(date)"
+
+artifacts:
+  files:
+    - '**/*'
+  name: easymarket-backend # ここには好きなアーティファクト名を設定してください。
+  discard-paths: yes
+  base-directory: $CODEBUILD_SRC_DIR
