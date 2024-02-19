@@ -28,7 +28,7 @@ phases:
       - >
         echo '[
           {
-            "name": "sample-webserver",
+            "name": "laravel-matching-web",
             "imageUri": "'${AWS_ACCOUNT_ID}'.dkr.ecr.'${AWS_DEFAULT_REGION}'.amazonaws.com/easymarket-backend:latest"
           }
         ]' > imagedefinitions.json
