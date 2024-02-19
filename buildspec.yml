@@ -15,7 +15,7 @@ phases:
         echo "Checking for Dockerfile at $DOCKERFILE_PATH..."
         if [ -f "$DOCKERFILE_PATH" ]; then
           echo "Dockerfile found, proceeding with build..."
-          docker build -f $DOCKERFILE_PATH -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/my-custom-laravel-image:latest .
+          docker build -f $DOCKERFILE_PATH -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/easymarket-backend:latest .
         else
           echo "Dockerfile not found at $DOCKERFILE_PATH, aborting build."
           exit 1
