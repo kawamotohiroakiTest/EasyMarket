@@ -11,7 +11,7 @@ phases:
       - echo "Listing contents of the current directory for debug purposes..."
       - ls -lah
       - |
-        DOCKERFILE_PATH="vendor/laravel/sail/runtimes/8.2/Dockerfile"
+        DOCKERFILE_PATH="Dockerfile"
         echo "Checking for Dockerfile at $DOCKERFILE_PATH..."
         if [ -f "$DOCKERFILE_PATH" ]; then
           echo "Dockerfile found, proceeding with build..."
