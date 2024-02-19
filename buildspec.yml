@@ -23,5 +23,5 @@ phases:
   post_build:
     commands:
       - echo "Pushing the Docker image..."
-      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/my-custom-laravel-image:latest
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/easymarket-backend:latest
       - echo "Build and push completed on $(date)"
