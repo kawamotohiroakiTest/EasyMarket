@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM --platform=linux/x86_64 ubuntu:22.04
 
 LABEL maintainer="Taylor Otwell"
 
@@ -45,8 +45,11 @@ RUN apt-get update \
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 
+COPY . /var/www/html
 
 
 EXPOSE 8000
 
-ENTRYPOINT ["start-container"]
+# ENTRYPOINT ["start-container"]
+ENTRYPOINT ["/usr/bin/php", "-S", "0.0.0.0:80", "-t", "/var/www/html/public"]
+
