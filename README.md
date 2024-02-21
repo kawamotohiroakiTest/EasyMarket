@@ -9,6 +9,7 @@ cd easymarket-backend
 ./vendor/bin/sail up
 
 //別のターミナルで実行します
+
 cd easymarket-frontend
 
 npm run dev
