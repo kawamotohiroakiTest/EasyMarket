@@ -5,6 +5,7 @@ zipファイルを解凍します。
 cd easymarket-backend
 
 //コンテナを一括で立ち上げる
+
 ./vendor/bin/sail up
 
 cd easymarket-frontend
