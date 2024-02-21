@@ -1,13 +1,14 @@
-# 環境構築
+# 環境構築(所要時間3分)
 
-zipファイルを解凍します。
+zipファイル「ポートフォリオ」を解凍してから作業してください
 
 cd easymarket-backend
 
-//コンテナを一括で立ち上げる
+//コンテナが一括で立ち上がります
 
 ./vendor/bin/sail up
 
+//別のターミナルで実行します
 cd easymarket-frontend
 
 npm run dev
@@ -37,6 +38,7 @@ http://localhost:8085/
 TDD(テスト駆動開発)でAPIでデータをやり取りしています。
 
 ##　実装機能
+
 会員登録、認証
 
 商品登録
