@@ -18,6 +18,7 @@ use App\Services\easymarket\DealService\DealServiceInterface;
 use App\Services\easymarket\DealService\Exceptions\InvalidStatusTransitionException;
 use App\Services\easymarket\DealService\Exceptions\IncompleteBuyerShippingInfoException;
 use App\Services\easymarket\DealService\Exceptions\PaymentIntentIsNotSucceededException;
+use App\Policies\EasyMarket\API\DealPolicy;
 
 
 use Illuminate\Support\Facades\Auth;

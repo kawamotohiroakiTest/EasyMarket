@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Policies\easymarket\API;
+namespace App\Policies;
 
 use App\Models\Deal;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class DealPolicy
 {
